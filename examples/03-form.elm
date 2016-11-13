@@ -19,11 +19,12 @@ type alias Model =
   { name : String
   , password : String
   , passwordAgain : String
+  , age : Int
   }
 
 model : Model
 model =
-  Model "" "" ""
+  Model "" "" "" 0
 
 
 -- UPDATE
@@ -32,6 +33,7 @@ type Msg
     = Name String
     | Password String
     | PasswordAgain String
+    | Age String
 
 update : Msg -> Model -> Model
 update msg model =
@@ -45,6 +47,9 @@ update msg model =
     PasswordAgain password ->
       { model | passwordAgain = password }
 
+    Age age ->
+      { model | age = String.toInt age |> Result.toMaybe |> Maybe.withDefault 0 }
+
 
 -- VIEW
 
@@ -54,6 +59,7 @@ view model =
     [ input [ type' "text", placeholder "Name", onInput Name ] []
     , input [ type' "password", placeholder "Password", onInput Password ] []
     , input [ type' "password", placeholder "Re-enter Password", onInput PasswordAgain ] []
+    , input [ type' "number", placeholder "Age", onInput Age ] []
     , viewValidation model
     ]
 
@@ -71,6 +77,10 @@ viewValidation model =
         ("red", "Password must contain at least one digit")
       else if passwordCaseCheck model then
         ("red", "Password must contain upper and lower case characters")
+      else if model.age < 21 then
+        ("red", "You must be at least 21 to sign up")
+      else if model.name == "" then
+        ("red", "You must input your name")
       else
         ("green", "Your password passes validations")
   in
