@@ -69,6 +69,8 @@ viewValidation model =
         ("red", "Passwords do not match")
       else if passwordHasNumber model then
         ("red", "Password must contain at least one digit")
+      else if passwordCaseCheck model then
+        ("red", "Password must contain upper and lower case characters")
       else
         ("green", "Your password passes validations")
   in
@@ -85,3 +87,7 @@ passwordBlank model =
 passwordHasNumber : Model -> Bool
 passwordHasNumber model =
   any isDigit model.password == False
+
+passwordCaseCheck : Model -> Bool
+passwordCaseCheck model =
+  (any isUpper model.password && any isLower model.password) == False
