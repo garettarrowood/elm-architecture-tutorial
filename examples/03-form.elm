@@ -2,7 +2,8 @@ import Html exposing (..)
 import Html.App as Html
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
-import String
+import String exposing (..)
+import Char exposing (..)
 
 main =
   Html.beginnerProgram
@@ -60,15 +61,27 @@ viewValidation : Model -> Html msg
 viewValidation model =
   let
     (color, message) =
-      if passwordLength model then
+      if passwordBlank model then
+        ("blue", "Please enter password")
+      else if passwordMinLength model then
         ("red", "Password must be 8 or more characters")
       else if model.password /= model.passwordAgain then
         ("red", "Passwords do not match")
+      else if passwordHasNumber model then
+        ("red", "Password must contain at least one digit")
       else
         ("green", "Your password passes validations")
   in
     div [ style [("color", color)] ] [ text message ]
 
-passwordLength : Model -> Bool
-passwordLength model =
-  String.length model.password < 8
+passwordMinLength : Model -> Bool
+passwordMinLength model =
+  length model.password < 8
+
+passwordBlank : Model -> Bool
+passwordBlank model =
+  model.password == ""
+
+passwordHasNumber : Model -> Bool
+passwordHasNumber model =
+  any isDigit model.password == False
