@@ -2,7 +2,7 @@ import Html exposing (..)
 import Html.App as Html
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
-
+import String
 
 main =
   Html.beginnerProgram
@@ -12,9 +12,7 @@ main =
     }
 
 
-
 -- MODEL
-
 
 type alias Model =
   { name : String
@@ -22,21 +20,17 @@ type alias Model =
   , passwordAgain : String
   }
 
-
 model : Model
 model =
   Model "" "" ""
 
 
-
 -- UPDATE
-
 
 type Msg
     = Name String
     | Password String
     | PasswordAgain String
-
 
 update : Msg -> Model -> Model
 update msg model =
@@ -51,9 +45,7 @@ update msg model =
       { model | passwordAgain = password }
 
 
-
 -- VIEW
-
 
 view : Model -> Html Msg
 view model =
@@ -64,14 +56,19 @@ view model =
     , viewValidation model
     ]
 
-
 viewValidation : Model -> Html msg
 viewValidation model =
   let
     (color, message) =
-      if model.password == model.passwordAgain then
-        ("green", "OK")
+      if passwordLength model then
+        ("red", "Password must be 8 or more characters")
+      else if model.password /= model.passwordAgain then
+        ("red", "Passwords do not match")
       else
-        ("red", "Passwords do not match!")
+        ("green", "Your password passes validations")
   in
     div [ style [("color", color)] ] [ text message ]
+
+passwordLength : Model -> Bool
+passwordLength model =
+  String.length model.password < 8
