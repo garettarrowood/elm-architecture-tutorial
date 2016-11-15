@@ -1,7 +1,7 @@
 import Html exposing (..)
 import Html.App as Html
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onInput, onClick)
 import String exposing (..)
 import Char exposing (..)
 
@@ -20,11 +20,12 @@ type alias Model =
   , password : String
   , passwordAgain : String
   , age : Int
+  , submitted : Bool
   }
 
 model : Model
 model =
-  Model "" "" "" 0
+  Model "" "" "" 0 False
 
 
 -- UPDATE
@@ -34,6 +35,7 @@ type Msg
     | Password String
     | PasswordAgain String
     | Age String
+    | Submit
 
 update : Msg -> Model -> Model
 update msg model =
@@ -50,20 +52,30 @@ update msg model =
     Age age ->
       { model | age = String.toInt age |> Result.toMaybe |> Maybe.withDefault 0 }
 
+    Submit ->
+      { model | submitted = True }
+
 
 -- VIEW
 
 view : Model -> Html Msg
 view model =
-  div []
-    [ input [ type' "text", placeholder "Name", onInput Name ] []
-    , input [ type' "password", placeholder "Password", onInput Password ] []
-    , input [ type' "password", placeholder "Re-enter Password", onInput PasswordAgain ] []
-    , input [ type' "number", placeholder "Age", onInput Age ] []
-    , viewValidation model
-    ]
+  let
+    validation = if model.submitted then
+      viewValidation model
+    else
+      div [] [ text "Please submit the form" ]
+  in
+    div []
+      [ input [ type' "text", placeholder "Name", onInput Name ] []
+      , input [ type' "password", placeholder "Password", onInput Password ] []
+      , input [ type' "password", placeholder "Re-enter Password", onInput PasswordAgain ] []
+      , input [ type' "number", placeholder "Age", onInput Age ] []
+      , button [ type' "submit", onClick Submit ] [ text "Submit" ]
+      , validation
+      ]
 
-viewValidation : Model -> Html msg
+viewValidation : Model -> Html Msg
 viewValidation model =
   let
     (color, message) =
